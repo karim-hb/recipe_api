@@ -1,7 +1,15 @@
 """ test for models """
-
+from decimal import Decimal
 from django.test import TestCase
 from django.contrib.auth import get_user_model
+
+from core import models
+
+def create_user(email="test@example.com", password="testpassword"):
+    """ create user and return it """
+    return get_user_model().objects.create_user(email,password)
+        
+    
 
 class ModelTestCase(TestCase):
     """ test models """
@@ -39,3 +47,25 @@ class ModelTestCase(TestCase):
         
         self.assertTrue(user.is_superuser)
         self.assertTrue(user.is_staff)
+        
+    def test_for_Create_recipe(self):
+        """ test for creating recipe """
+        user = get_user_model().objects.create_user(
+            email='email@example.com',
+            password='password'
+        )
+        recipe = models.Recipe.objects.create(
+            user=user,
+            title='recipe title',
+            time_minutes=4,
+            price=Decimal('5.5'),
+            description='our test recipe'
+        )
+        self.assertEqual(str(recipe),recipe.title)
+    
+    def test_for_tag_model(self):
+        """ test for creating tag models """
+        user = create_user()
+        tag = models.Tag.objects.create(user=user,name="tag1")
+        
+        self.assertEqual(str(tag),tag.name)
